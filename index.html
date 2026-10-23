@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RescueGrid — Live Flood SOS & Emergency Response</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --deep-navy: #0B3C5D;
+      --flood-blue: #328CC1;
+      --ice-white: #F4F8FB;
+      --alert-red: #D62828;
+      --safe-green: #2E9E5B;
+      --warn-amber: #F4A100;
+      --charcoal: #1B2733;
+      --urg-critical: #D62828;
+      --urg-high: #F77F00;
+      --urg-medium: #FCBF49;
+      --urg-low: #328CC1;
+      --urg-resolved: #2E9E5B;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--ice-white);
+      color: var(--charcoal);
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Exact Flood SOS Palette & Contrast Rules */
+    .bg-navy { background-color: #0B3C5D; color: #FFFFFF; }
+    .bg-flood { background-color: #328CC1; color: #FFFFFF; }
+    .bg-ice { background-color: #F4F8FB; color: #1B2733; }
+    .bg-sos-red { background-color: #D62828; color: #FFFFFF; }
+    .bg-safe-green { background-color: #2E9E5B; color: #FFFFFF; }
+    .bg-warn-amber { background-color: #F4A100; color: #1B2733; }
+
+    .bg-urg-critical { background-color: #D62828; color: #FFFFFF; }
+    .bg-urg-high { background-color: #F77F00; color: #FFFFFF; }
+    .bg-urg-medium { background-color: #FCBF49; color: #1B2733; }
+    .bg-urg-low { background-color: #328CC1; color: #FFFFFF; }
+    .bg-urg-resolved { background-color: #2E9E5B; color: #FFFFFF; }
+
+    /* Interactive Button Effects */
+    .btn-interactive {
+      transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-interactive:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px -6px rgba(11, 60, 93, 0.25);
+    }
+    .btn-interactive:active {
+      transform: translateY(0px) scale(0.98);
+    }
+
+    .btn-navy { background-color: #0B3C5D; color: #FFFFFF; }
+    .btn-navy:hover { background-color: #0e4b73; }
+
+    .btn-flood { background-color: #328CC1; color: #FFFFFF; }
+    .btn-flood:hover { background-color: #2779aa; }
+
+    .btn-sos {
+      background-color: #D62828;
+      color: #FFFFFF;
+      box-shadow: 0 8px 22px -4px rgba(214, 40, 40, 0.45);
+    }
+    .btn-sos:hover {
+      background-color: #bf2020;
+      box-shadow: 0 12px 28px -4px rgba(214, 40, 40, 0.6);
+    }
+
+    .btn-safe { background-color: #2E9E5B; color: #FFFFFF; }
+    .btn-safe:hover { background-color: #25854b; }
+
+    .btn-amber { background-color: #F4A100; color: #1B2733; }
+    .btn-amber:hover { background-color: #df9200; }
+
+    /* Card Polish & Hover Elevation */
+    .glass-card {
+      background: #FFFFFF;
+      border-radius: 20px;
+      border: 1px solid rgba(50, 140, 193, 0.16);
+      box-shadow: 0 10px 30px -10px rgba(11, 60, 93, 0.07);
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hover-lift:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 36px -12px rgba(11, 60, 93, 0.13);
+    }
+
+    /* Smooth Tab Entrance Animation */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .tab-view {
+      animation: fadeSlideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Map Radar & Pulse Animations */
+    @keyframes pulseRing {
+      0% { transform: scale(0.8); opacity: 0.9; }
+      75% { transform: scale(2.2); opacity: 0; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+    .pulse-circle {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: pulseRing 2.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    }
+
+    @keyframes radarSweep {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .radar-sweep-group {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: radarSweep 6s linear infinite;
+    }
+
+    @keyframes riverFlow {
+      to { stroke-dashoffset: -40; }
+    }
+    .river-flow-line {
+      animation: riverFlow 2.8s linear infinite;
+    }
+
+    @keyframes dispatchDash {
+      to { stroke-dashoffset: -24; }
+    }
+    .dispatch-line {
+      animation: dispatchDash 1s linear infinite;
+    }
+
+    @keyframes sonarBurst {
+      0% { r: 10; stroke-opacity: 0.95; stroke-width: 4; }
+      100% { r: 170; stroke-opacity: 0; stroke-width: 1; }
+    }
+    .sonar-wave {
+      animation: sonarBurst 1.4s ease-out forwards;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #F4F8FB; }
+    ::-webkit-scrollbar-thumb { background: #328CC1; border-radius: 9999px; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-[#328CC1] selection:text-white">
+
+  <!-- ========================================================================= -->
+  <!-- CLEAN, SPACIOUS HEADER (#0B3C5D Deep Navy with White Text)                -->
+  <!-- ========================================================================= -->
+  <header class="bg-navy sticky top-0 z-40 shadow-md">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+      <!-- Brand Identity -->
+      <div class="flex items-center gap-3.5">
+        <div class="w-11 h-11 rounded-2xl bg-sos-red flex items-center justify-center font-extrabold text-base tracking-wider shadow-lg border border-white/25">
+          SOS
+        </div>
+        <div>
+          <div class="flex items-center gap-2.5">
+            <h1 class="text-xl font-extrabold tracking-tight text-white">RescueGrid</h1>
+            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-flood text-white">Live Flood Response</span>
+          </div>
+          <p class="text-xs text-white/75 mt-0.5">Real-Time GPS Map • Citizen Distress App &amp; SMS • Nearby Volunteer Alerts</p>
+        </div>
+      </div>
+
+      <!-- Clean 3-Pill Navigation -->
+      <nav class="flex flex-wrap items-center gap-2 bg-white/10 p-1.5 rounded-2xl" aria-label="Main Navigation">
+        <button id="tabBtnMap" data-tab="mapView" class="nav-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-flood text-white shadow transition">
+          Live GPS Map &amp; Queue
+        </button>
+        <button id="tabBtnCitizen" data-tab="citizenView" class="nav-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white/90 hover:bg-white/10 transition">
+          Citizen SOS (App &amp; SMS)
+        </button>
+        <button id="tabBtnVolunteers" data-tab="volunteerView" class="nav-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white/90 hover:bg-white/10 transition">
+          Volunteers &amp; Safe Shelters
+        </button>
+      </nav>
+
+      <!-- Right Actions: Sound Effects Toggle + Primary Red SOS CTA -->
+      <div class="flex items-center gap-3">
+        <button id="soundToggleBtn" class="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-2 transition" title="Toggle interactive sound effects">
+          <span id="soundIcon">🔊</span>
+          <span id="soundLabel" class="hidden sm:inline">Sound FX On</span>
+        </button>
+        <button id="quickSosBtn" class="btn-sos btn-interactive px-5 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm flex items-center gap-2.5 border border-white/25">
+          <span class="inline-block w-2.5 h-2.5 rounded-full bg-white animate-ping"></span>
+          <span>SEND DISTRESS SOS</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- AIRY 4-CARD SUMMARY RIBBON                                                -->
+  <!-- ========================================================================= -->
+  <section class="max-w-7xl w-full mx-auto px-6 pt-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div class="glass-card hover-lift p-5 flex items-center justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-[#1B2733]/60">Verified on Live Map</span>
+          <div class="text-3xl font-extrabold text-[#0B3C5D] mt-1" id="kpiVerifiedCount">0</div>
+          <span class="text-xs text-[#1B2733]/70 mt-1 block">Active GPS-pinned incidents</span>
+        </div>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-flood">GPS LIVE</span>
+      </div>
+
+      <div class="glass-card hover-lift p-5 flex items-center justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-[#1B2733]/60">Critical Emergencies</span>
+          <div class="text-3xl font-extrabold text-[#D62828] mt-1" id="kpiCriticalCount">0</div>
+          <span class="text-xs text-[#1B2733]/70 mt-1 block" id="kpiPeopleCount">0 citizens stranded</span>
+        </div>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-urg-critical">CRITICAL</span>
+      </div>
+
+      <div class="glass-card hover-lift p-5 flex items-center justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-[#1B2733]/60">Ready Volunteers</span>
+          <div class="text-3xl font-extrabold text-[#0B3C5D] mt-1" id="kpiVolunteersFree">0</div>
+          <span class="text-xs text-[#1B2733]/70 mt-1 block" id="kpiAlertsSentBadge">0 proximity alerts sent</span>
+        </div>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-warn-amber">NEARBY</span>
+      </div>
+
+      <div class="glass-card hover-lift p-5 flex items-center justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-[#1B2733]/60">Safe Shelter Capacity</span>
+          <div class="text-3xl font-extrabold text-[#2E9E5B] mt-1" id="kpiShelterFree">0</div>
+          <span class="text-xs text-[#1B2733]/70 mt-1 block">Open beds in relief camps</span>
+        </div>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-safe-green">SAFE BEDS</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOAST NOTIFICATION STACK -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5 max-w-md w-full pointer-events-none px-4"></div>
+
+  <!-- ========================================================================= -->
+  <!-- MAIN CONTENT AREA                                                         -->
+  <!-- ========================================================================= -->
+  <main class="max-w-7xl w-full mx-auto px-6 py-6 flex-1">
+
+    <!-- ======================================================================= -->
+    <!-- TAB 1: SPACIOUS LIVE GPS INCIDENT MAP & PRIORITY QUEUE                  -->
+    <!-- ======================================================================= -->
+    <section id="mapView" class="tab-view space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left 7 Columns: Interactive Live GPS Map -->
+        <div class="lg:col-span-7 glass-card overflow-hidden flex flex-col">
+          <!-- Map Header -->
+          <div class="bg-navy px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 class="font-bold text-base text-white">Live GPS Map of Verified Incidents</h2>
+              <p class="text-xs text-white/75 mt-0.5">Click any pin to inspect &amp; ping nearby volunteers, or click the map to pick GPS coordinates</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <label class="flex items-center gap-2 text-xs font-semibold bg-white/10 hover:bg-white/15 px-3 py-1.5 rounded-xl cursor-pointer text-white transition">
+                <input type="checkbox" id="toggleVerifiedOnly" checked class="accent-[#328CC1]" />
+                <span>Verified Only</span>
+              </label>
+              <label class="flex items-center gap-2 text-xs font-semibold bg-white/10 hover:bg-white/15 px-3 py-1.5 rounded-xl cursor-pointer text-white transition">
+                <input type="checkbox" id="toggleShowVolunteers" checked class="accent-[#2E9E5B]" />
+                <span>Show Volunteers &amp; Shelters</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Clean Urgency Key & Proximity Radar Slider -->
+          <div class="px-6 py-3 bg-[#F4F8FB] border-b border-[#328CC1]/15 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="font-bold text-[#1B2733] mr-1">Urgency:</span>
+              <span class="px-2.5 py-1 rounded-lg font-bold bg-urg-critical">Critical</span>
+              <span class="px-2.5 py-1 rounded-lg font-bold bg-urg-high">High</span>
+              <span class="px-2.5 py-1 rounded-lg font-bold bg-urg-medium">Medium</span>
+              <span class="px-2.5 py-1 rounded-lg font-bold bg-urg-low">Low</span>
+              <span class="px-2.5 py-1 rounded-lg font-bold bg-urg-resolved">Resolved</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <label for="mapRadiusSlider" class="font-bold text-[#1B2733]">Volunteer Radar:</label>
+              <input id="mapRadiusSlider" type="range" min="1" max="12" step="0.5" value="5" class="w-24 accent-[#0B3C5D] cursor-pointer" />
+              <span id="mapRadiusLabel" class="font-mono-code font-bold px-2.5 py-1 rounded-lg bg-warn-amber">5.0 km</span>
+            </div>
+          </div>
+
+          <!-- Interactive SVG Map Canvas -->
+          <div class="relative w-full bg-[#E6F2F8] select-none overflow-hidden" style="height: 430px;">
+            <svg id="liveGpsMapSvg" viewBox="0 0 760 430" class="w-full h-full cursor-crosshair">
+              <defs>
+                <pattern id="gpsGrid" width="48" height="48" patternUnits="userSpaceOnUse">
+                  <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#328CC1" stroke-width="0.6" stroke-opacity="0.22" />
+                </pattern>
+                <linearGradient id="riverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#328CC1" stop-opacity="0.38" />
+                  <stop offset="100%" stop-color="#0B3C5D" stop-opacity="0.28" />
+                </linearGradient>
+                <radialGradient id="radarGrad" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#328CC1" stop-opacity="0.26" />
+                  <stop offset="100%" stop-color="#328CC1" stop-opacity="0.03" />
+                </radialGradient>
+              </defs>
+
+              <!-- Subtle Coordinate Grid -->
+              <rect width="760" height="430" fill="url(#gpsGrid)" />
+
+              <!-- Soft District Contours -->
+              <path d="M 30,35 Q 190,20 350,50 T 720,45 L 730,210 Q 510,230 350,195 T 25,180 Z" fill="#DCECF6" opacity="0.55" />
+              <path d="M 25,200 Q 240,210 420,235 T 735,245 L 725,405 Q 430,415 240,395 T 30,390 Z" fill="#D3E7F4" opacity="0.45" />
+
+              <!-- Animated Flowing Rivers (#328CC1 Flood Blue) -->
+              <path d="M 0,120 Q 195,150 355,215 T 760,285" fill="none" stroke="url(#riverGrad)" stroke-width="28" stroke-linecap="round" />
+              <path d="M 0,120 Q 195,150 355,215 T 760,285" fill="none" stroke="#328CC1" stroke-width="3" stroke-dasharray="10,10" class="river-flow-line" opacity="0.75" />
+              <path d="M 185,0 Q 255,125 355,215 T 495,430" fill="none" stroke="url(#riverGrad)" stroke-width="18" stroke-linecap="round" />
+
+              <!-- Clean Area Names -->
+              <g font-family="Inter, sans-serif" font-weight="700" font-size="10.5" fill="#0B3C5D" opacity="0.5" letter-spacing="0.06em">
+                <text x="95" y="65">WAKAD</text>
+                <text x="315" y="68">PIMPRI-CHINCHWAD</text>
+                <text x="155" y="185">BANER</text>
+                <text x="360" y="185">AUNDH</text>
+                <text x="145" y="305">KOTHRUD</text>
+                <text x="435" y="255">PUNE CENTRAL</text>
+                <text x="235" y="385">SINHAGAD RD</text>
+                <text x="585" y="295">HADAPSAR</text>
+              </g>
+
+              <!-- Dynamic Map Layers -->
+              <g id="mapRadarLayer"></g>
+              <g id="mapSonarLayer"></g>
+              <g id="mapSheltersLayer"></g>
+              <g id="mapVolunteersLayer"></g>
+              <g id="mapIncidentsLayer"></g>
+            </svg>
+
+            <!-- Floating Pill Legend & Live GPS Readout -->
+            <div id="mapCursorReadout" class="absolute bottom-3 left-3 bg-navy/95 backdrop-blur px-3.5 py-1.5 rounded-xl text-xs font-mono-code shadow-md">
+              GPS: 18.5074° N, 73.8077° E • Click map to set SOS coordinates
+            </div>
+          </div>
+
+          <!-- Spacious Selected Incident Action Bar -->
+          <div id="selectedIncidentPanel" class="p-5 bg-white border-t border-[#328CC1]/15 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-extrabold uppercase tracking-wider text-[#328CC1]">Selected Incident</span>
+                <span id="selIncChannelBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#F4F8FB] text-[#0B3C5D]">MOBILE APP</span>
+              </div>
+              <h3 id="selIncTitle" class="text-base font-extrabold text-[#1B2733]">Select an incident pin on the map</h3>
+              <p id="selIncMeta" class="text-xs text-[#1B2733]/75 font-mono-code">GPS coordinates and nearby volunteer status will appear here.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button id="btnVerifySelected" class="btn-flood btn-interactive px-3.5 py-2 rounded-xl text-xs font-bold">Verify Pin</button>
+              <button id="btnAlertNearbySelected" class="btn-amber btn-interactive px-3.5 py-2 rounded-xl text-xs font-bold">Alert Nearby Volunteers</button>
+              <button id="btnAssignNearestSelected" class="btn-navy btn-interactive px-3.5 py-2 rounded-xl text-xs font-bold">Dispatch Nearest</button>
+              <button id="btnResolveSelected" class="btn-safe btn-interactive px-3.5 py-2 rounded-xl text-xs font-bold">Mark Safe</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right 5 Columns: Decluttered Priority Rescue Queue -->
+        <div class="lg:col-span-5 glass-card flex flex-col overflow-hidden">
+          <div class="bg-navy px-6 py-4 flex items-center justify-between">
+            <div>
+              <h2 class="font-bold text-base text-white">Priority Rescue Queue</h2>
+              <p class="text-xs text-white/75 mt-0.5">Automatically ranked by urgency score</p>
+            </div>
+            <button id="btnResetFilters" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-flood text-white btn-interactive">Reset</button>
+          </div>
+
+          <!-- Clean Search & Filter Bar -->
+          <div class="p-4 bg-[#F4F8FB] border-b border-[#328CC1]/15 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div>
+              <label for="filterLocationInput" class="block font-bold text-[#1B2733] mb-1">Search Area</label>
+              <input id="filterLocationInput" type="text" placeholder="Kothrud, Baner..." class="w-full px-3 py-2 rounded-xl border border-[#328CC1]/30 bg-white text-[#1B2733] focus:outline-none focus:border-[#0B3C5D]" />
+            </div>
+            <div>
+              <label for="filterUrgencyInput" class="block font-bold text-[#1B2733] mb-1">Min Urgency</label>
+              <input id="filterUrgencyInput" type="number" min="0" max="200" value="0" class="w-full px-3 py-2 rounded-xl border border-[#328CC1]/30 bg-white text-[#1B2733] focus:outline-none focus:border-[#0B3C5D]" />
+            </div>
+            <div>
+              <label for="filterTypeSelect" class="block font-bold text-[#1B2733] mb-1">Emergency Type</label>
+              <select id="filterTypeSelect" class="w-full px-3 py-2 rounded-xl border border-[#328CC1]/30 bg-white text-[#1B2733] focus:outline-none focus:border-[#0B3C5D]">
+                <option value="ALL">All Emergencies</option>
+                <option value="FLOOD">Flood Only</option>
+                <option value="MEDICAL">Medical Only</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Spacious Queue List -->
+          <div id="incidentQueueList" class="p-4 space-y-3 overflow-y-auto flex-1" style="max-height: 470px;"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 2: CITIZEN MOBILE SOS APP & OFFLINE SMS GATEWAY                     -->
+    <!-- ======================================================================= -->
+    <section id="citizenView" class="tab-view hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left 6 Columns: Citizen Mobile SOS App -->
+        <div class="lg:col-span-6 glass-card overflow-hidden">
+          <div class="bg-navy px-6 py-4 flex items-center justify-between">
+            <div>
+              <h2 class="font-bold text-base text-white">Citizen Mobile SOS App</h2>
+              <p class="text-xs text-white/75 mt-0.5">Send a GPS-tagged distress request with live water-level &amp; urgency preview</p>
+            </div>
+            <span class="px-3 py-1 rounded-xl text-xs font-extrabold bg-sos-red">1-TAP GPS SOS</span>
+          </div>
+
+          <div class="p-6 space-y-5">
+            <!-- Emergency Type Toggle -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-[#1B2733]/70 mb-2">Select Emergency Type</label>
+              <div class="grid grid-cols-2 gap-3.5">
+                <button type="button" id="appTypeFloodBtn" class="btn-interactive p-3.5 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 bg-flood shadow-sm border-2 border-[#0B3C5D]">
+                  <span>🌊 Flood Rescue</span>
+                </button>
+                <button type="button" id="appTypeMedicalBtn" class="btn-interactive p-3.5 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 bg-[#F4F8FB] text-[#1B2733] border-2 border-[#328CC1]/30">
+                  <span>🚑 Medical Emergency</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Area & GPS Coordinates -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div>
+                <label for="appLocationSelect" class="block text-xs font-bold text-[#1B2733] mb-1.5">Area / Sector</label>
+                <select id="appLocationSelect" class="w-full px-3.5 py-2.5 rounded-xl border border-[#328CC1]/35 bg-[#F4F8FB] text-sm font-semibold text-[#1B2733]">
+                  <option value="Kothrud">Kothrud</option>
+                  <option value="Baner">Baner</option>
+                  <option value="Pimpri">Pimpri</option>
+                  <option value="Sinhagad Rd">Sinhagad Rd</option>
+                  <option value="Aundh">Aundh</option>
+                  <option value="Wakad">Wakad</option>
+                  <option value="Hadapsar">Hadapsar</option>
+                  <option value="Pune Central">Pune Central</option>
+                </select>
+              </div>
+              <div>
+                <label for="appLatInput" class="block text-xs font-bold text-[#1B2733] mb-1.5">Latitude (°N)</label>
+                <input id="appLatInput" type="number" step="0.0001" value="18.5074" class="w-full px-3.5 py-2.5 rounded-xl border border-[#328CC1]/35 bg-white font-mono-code text-sm text-[#1B2733]" />
+              </div>
+              <div>
+                <label for="appLngInput" class="block text-xs font-bold text-[#1B2733] mb-1.5">Longitude (°E)</label>
+                <input id="appLngInput" type="number" step="0.0001" value="73.8077" class="w-full px-3.5 py-2.5 rounded-xl border border-[#328CC1]/35 bg-white font-mono-code text-sm text-[#1B2733]" />
+              </div>
+            </div>
+
+            <!-- People Stranded & Phone -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label for="appPeopleInput" class="block text-xs font-bold text-[#1B2733] mb-1.5">People Stranded</label>
+                <input id="appPeopleInput" type="number" min="1" max="200" value="6" class="w-full px-3.5 py-2.5 rounded-xl border border-[#328CC1]/35 bg-white text-sm font-bold text-[#1B2733]" />
+              </div>
+              <div>
+                <label for="appPhoneInput" class="block text-xs font-bold text-[#1B2733] mb-1.5">Callback Phone Number</label>
+                <input id="appPhoneInput" type="text" value="9876543210" class="w-full px-3.5 py-2.5 rounded-xl border border-[#328CC1]/35 bg-white font-mono-code text-sm text-[#1B2733]" />
+              </div>
+            </div>
+
+            <!-- Interactive Water Level Visualizer OR Critical Condition Switch -->
+            <div id="appFloodExtraBox" class="p-4 rounded-2xl bg-[#F4F8FB] border border-[#328CC1]/30 space-y-2">
+              <div class="flex items-center justify-between">
+                <label for="appWaterLevelSlider" class="text-xs font-bold text-[#0B3C5D]">Flood Water Depth: <span id="appWaterLevelVal" class="ml-1 px-2.5 py-0.5 rounded-lg bg-flood">5 ft</span></label>
+                <span class="text-xs font-semibold text-[#1B2733]/70">+8 urgency per foot</span>
+              </div>
+              <input id="appWaterLevelSlider" type="range" min="1" max="15" value="5" class="w-full accent-[#328CC1] cursor-pointer" />
+              <div class="w-full h-3 rounded-full bg-white overflow-hidden border border-[#328CC1]/25">
+                <div id="waterGaugeBar" class="h-full bg-flood transition-all duration-300" style="width: 33%;"></div>
+              </div>
+            </div>
+
+            <div id="appMedicalExtraBox" class="hidden p-4 rounded-2xl bg-[#F4F8FB] border border-[#D62828]/30">
+              <label class="flex items-center justify-between cursor-pointer">
+                <div>
+                  <span class="block text-xs font-bold text-[#D62828]">Critical Life-Threatening Condition?</span>
+                  <span class="text-xs text-[#1B2733]/75">Adds immediate high-priority boost (+40 urgency)</span>
+                </div>
+                <input id="appCriticalCheckbox" type="checkbox" checked class="w-5 h-5 accent-[#D62828]" />
+              </label>
+            </div>
+
+            <!-- Checkboxes -->
+            <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#F4F8FB] text-xs">
+              <label class="flex items-center gap-2 font-semibold text-[#1B2733] cursor-pointer">
+                <input id="appAutoVerifyCheck" type="checkbox" checked class="accent-[#0B3C5D]" />
+                <span>Verify GPS automatically (+10 urgency)</span>
+              </label>
+              <label class="flex items-center gap-2 font-semibold text-[#1B2733] cursor-pointer">
+                <input id="appAutoAlertCheck" type="checkbox" checked class="accent-[#2E9E5B]" />
+                <span>Alert nearby volunteers immediately</span>
+              </label>
+            </div>
+
+            <!-- Live Urgency Preview Banner -->
+            <div class="p-4 rounded-2xl bg-navy flex items-center justify-between">
+              <div>
+                <span class="text-xs text-white/75 block">Calculated Priority Score</span>
+                <span id="appFormulaPreview" class="text-xs font-mono-code text-white font-semibold mt-0.5 block">6 people • 5 ft water • GPS Verified</span>
+              </div>
+              <span id="appUrgencyBadgePreview" class="px-3.5 py-1.5 rounded-xl font-extrabold text-xs bg-urg-critical">80 • CRITICAL</span>
+            </div>
+
+            <!-- Big SOS Button -->
+            <button type="button" id="submitMobileSosBtn" class="w-full py-4 rounded-2xl btn-sos btn-interactive font-extrabold text-base tracking-wide flex items-center justify-center gap-2.5">
+              <span>🚨 SEND DISTRESS SOS NOW</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right 6 Columns: Offline Citizen SMS Distress Simulator -->
+        <div class="lg:col-span-6 glass-card overflow-hidden flex flex-col justify-between">
+          <div>
+            <div class="bg-navy px-6 py-4 flex items-center justify-between">
+              <div>
+                <h2 class="font-bold text-base text-white">Offline SMS Distress Gateway</h2>
+                <p class="text-xs text-white/75 mt-0.5">Works without internet — citizens text a short SOS message with GPS coordinates</p>
+              </div>
+              <span class="px-3 py-1 rounded-xl text-xs font-extrabold bg-warn-amber">2G SMS FALLBACK</span>
+            </div>
+
+            <div class="p-6 space-y-5">
+              <div class="p-4 rounded-2xl bg-warn-amber text-xs font-semibold">
+                <div class="font-bold mb-1">Citizen SMS Format:</div>
+                <div class="font-mono-code text-xs">SOS | TYPE | AREA | LAT,LNG | PEOPLE | WATER_FT_OR_CRITICAL | PHONE</div>
+              </div>
+
+              <!-- 1-Click Preset SMS Messages -->
+              <div>
+                <span class="block text-xs font-bold text-[#1B2733] mb-2">Try a Sample Citizen Text Message:</span>
+                <div class="flex flex-wrap gap-2">
+                  <button type="button" data-sms="SOS|FLOOD|Sinhagad Rd|18.4698,73.8223|9|7|9823011223" class="sms-preset-btn btn-interactive px-3.5 py-2 rounded-xl text-xs font-bold btn-flood">
+                    Sinhagad Rd Flood (9 ppl, 7ft)
+                  </button>
+                  <button type="button" data-sms="SOS|MEDICAL|Pimpri|18.6298,73.7997|4|true|9765123456" class="sms-preset-btn btn-interactive px-3.5 py-2 rounded-xl text-xs font-bold btn-sos">
+                    Pimpri Critical Medical (4 ppl)
+                  </button>
+                  <button type="button" data-sms="SOS|FLOOD|Wakad|18.5987,73.7644|3|2|9890989011" class="sms-preset-btn btn-interactive px-3.5 py-2 rounded-xl text-xs font-bold btn-navy">
+                    Wakad Rising Water (3 ppl, 2ft)
+                  </button>
+                </div>
+              </div>
+
+              <!-- SMS Input Box -->
+              <div>
+                <label for="rawSmsInput" class="block text-xs font-bold text-[#1B2733] mb-1.5">Incoming SMS Text Message:</label>
+                <textarea id="rawSmsInput" rows="3" class="w-full p-3.5 rounded-2xl border border-[#328CC1]/40 font-mono-code text-sm bg-[#F4F8FB] text-[#1B2733] focus:outline-none focus:border-[#0B3C5D]">SOS|FLOOD|Sinhagad Rd|18.4698,73.8223|9|7|9823011223</textarea>
+              </div>
+
+              <button type="button" id="parseSmsBtn" class="w-full py-3.5 rounded-2xl btn-navy btn-interactive font-extrabold text-sm">
+                Receive &amp; Pin Citizen SMS on Live Map
+              </button>
+
+              <!-- Live SMS Activity Feed -->
+              <div>
+                <span class="block text-xs font-bold text-[#1B2733] mb-2">Live Distress Transmission Feed:</span>
+                <div id="smsGatewayLog" class="bg-[#F4F8FB] rounded-2xl p-4 border border-[#328CC1]/20 font-mono-code text-xs space-y-2 max-h-48 overflow-y-auto"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- TAB 3: VOLUNTEER PROXIMITY ALERTS & SAFE SHELTERS                       -->
+    <!-- ======================================================================= -->
+    <section id="volunteerView" class="tab-view hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left 7 Columns: Nearby Volunteers by Location -->
+        <div class="lg:col-span-7 glass-card overflow-hidden">
+          <div class="bg-navy px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 class="font-bold text-base text-white">Nearby Volunteers &amp; Location Alerts</h2>
+              <p class="text-xs text-white/75 mt-0.5"> Automatically calculates real-time GPS distance to each volunteer</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <select id="alertTargetRequestSelect" class="px-3 py-2 rounded-xl text-xs font-bold bg-white text-[#1B2733]"></select>
+              <button id="broadcastProximityAlertBtn" class="btn-amber btn-interactive px-3.5 py-2 rounded-xl text-xs font-extrabold">
+                Send Proximity Alert
+              </button>
+            </div>
+          </div>
+
+          <div class="p-6 space-y-5">
+            <!-- Quick Register Volunteer Bar -->
+            <div class="p-3.5 rounded-2xl bg-[#F4F8FB] border border-[#328CC1]/25 grid grid-cols-1 sm:grid-cols-5 gap-2.5 text-xs">
+              <input id="newVolName" type="text" placeholder="Volunteer Name" class="px-3 py-2 rounded-xl border border-[#328CC1]/30 bg-white text-[#1B2733]" />
+              <input id="newVolPhone" type="text" placeholder="Mobile Number" class="px-3 py-2 rounded-xl border border-[#328CC1]/30 bg-white text-[#1B2733]" />
+              <select id="newVolSkill" class="px-3 py-2 rounded-xl border border-[#328CC1]/30 bg-white text-[#1B2733]">
+                <option value="Boat Rescue">Boat Rescue</option>
+                <option value="First Aid">First Aid</option>
+                <option value="Paramedic">Paramedic</option>
+                <option value="Swimmer & Rope">Swimmer &amp; Rope</option>
+              </select>
+              <select id="newVolLoc" class="px-3 py-2 rounded-xl border border-[#328CC1]/30 bg-white text-[#1B2733]">
+                <option value="Kothrud">Kothrud</option>
+                <option value="Baner">Baner</option>
+                <option value="Pimpri">Pimpri</option>
+                <option value="Sinhagad Rd">Sinhagad Rd</option>
+                <option value="Wakad">Wakad</option>
+                <option value="Hadapsar">Hadapsar</option>
+              </select>
+              <button id="addVolunteerBtn" class="btn-flood btn-interactive rounded-xl font-bold py-2">+ Add Volunteer</button>
+            </div>
+
+            <!-- Volunteer Cards -->
+            <div id="volunteerCardsContainer" class="space-y-3.5 max-h-[440px] overflow-y-auto pr-1"></div>
+          </div>
+        </div>
+
+        <!-- Right 5 Columns: Safe Shelters (#2E9E5B Green) -->
+        <div class="lg:col-span-5 glass-card overflow-hidden flex flex-col">
+          <div class="bg-safe-green px-6 py-4 flex items-center justify-between">
+            <div>
+              <h2 class="font-bold text-base text-white">Safe Shelters &amp; Relief Camps</h2>
+              <p class="text-xs text-white/90 mt-0.5">Check available beds and admit rescued families</p>
+            </div>
+            <span class="px-3 py-1 rounded-xl text-xs font-extrabold bg-navy">SAFE ZONES</span>
+          </div>
+
+          <div class="p-6 space-y-5 flex-1">
+            <!-- Add Shelter Row -->
+            <div class="p-3.5 rounded-2xl bg-[#F4F8FB] border border-[#2E9E5B]/30 grid grid-cols-1 sm:grid-cols-4 gap-2.5 text-xs">
+              <input id="newShelterName" type="text" placeholder="Shelter Name" class="px-3 py-2 rounded-xl border border-[#2E9E5B]/35 bg-white text-[#1B2733]" />
+              <select id="newShelterLoc" class="px-3 py-2 rounded-xl border border-[#2E9E5B]/35 bg-white text-[#1B2733]">
+                <option value="Kothrud">Kothrud</option>
+                <option value="Baner">Baner</option>
+                <option value="Pimpri">Pimpri</option>
+                <option value="Sinhagad Rd">Sinhagad Rd</option>
+                <option value="Hadapsar">Hadapsar</option>
+              </select>
+              <input id="newShelterCap" type="number" min="10" max="500" value="80" placeholder="Beds" class="px-3 py-2 rounded-xl border border-[#2E9E5B]/35 bg-white text-[#1B2733]" />
+              <button id="addShelterBtn" class="btn-safe btn-interactive rounded-xl font-bold py-2">+ Add Shelter</button>
+            </div>
+
+            <!-- Safe Shelter Cards -->
+            <div id="shelterCardsContainer" class="space-y-4"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ============================================================================
+    // SYNTHESIZED SOUND EFFECTS ENGINE (Web Audio API with Mute Toggle)
+    // ============================================================================
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function playSoundEffect(type) {
+      if (!soundEnabled) return;
+      try {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) audioCtx = new AudioContextClass();
+        }
+        if (!audioCtx) return;
+        if (audioCtx.state === "suspended") audioCtx.resume();
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === "sos") {
+          // Urgent dual-tone SOS beacon
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(740, now);
+          osc.frequency.setValueAtTime(980, now + 0.12);
+          osc.frequency.setValueAtTime(740, now + 0.24);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
+          osc.start(now);
+          osc.stop(now + 0.42);
+        } else if (type === "radar") {
+          // Sonar radar ping
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(880, now);
+          osc.frequency.exponentialRampToValueAtTime(440, now + 0.35);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        } else if (type === "success") {
+          // Chime for verified / safe
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.1);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        }
+      } catch (err) {
+        // Ignore audio errors if blocked by browser
+      }
+    }
+
+    // ============================================================================
+    // APPLICATION STATE
+    // ============================================================================
+    const SECTOR_COORDS = {
+      "Kothrud":       { lat: 18.5074, lng: 73.8077 },
+      "Baner":         { lat: 18.5590, lng: 73.7868 },
+      "Pimpri":        { lat: 18.6298, lng: 73.7997 },
+      "Sinhagad Rd":   { lat: 18.4698, lng: 73.8223 },
+      "Aundh":         { lat: 18.5580, lng: 73.8075 },
+      "Wakad":         { lat: 18.5987, lng: 73.7644 },
+      "Hadapsar":      { lat: 18.5089, lng: 73.9259 },
+      "Pune Central":  { lat: 18.5204, lng: 73.8567 }
+    };
+
+    const state = {
+      nextId: 6,
+      selectedRequestId: 1,
+      appSelectedType: "FLOOD",
+      alertRadiusKm: 5.0,
+      totalAlertsSent: 3,
+      requests: [
+        {
+          id: 1, type: "FLOOD", location: "Kothrud", lat: 18.5074, lng: 73.8077,
+          people: 8, extra: 5, verified: true, status: "PENDING",
+          channel: "MOBILE APP", phone: "9890112233"
+        },
+        {
+          id: 2, type: "MEDICAL", location: "Baner", lat: 18.5590, lng: 73.7868,
+          people: 4, extra: true, verified: true, status: "PENDING",
+          channel: "SMS", phone: "9765432109"
+        },
+        {
+          id: 3, type: "FLOOD", location: "Sinhagad Rd", lat: 18.4698, lng: 73.8223,
+          people: 6, extra: 4, verified: true, status: "ASSIGNED (Amit)",
+          channel: "SMS", phone: "9822334455"
+        },
+        {
+          id: 4, type: "MEDICAL", location: "Pimpri", lat: 18.6298, lng: 73.7997,
+          people: 3, extra: false, verified: false, status: "PENDING",
+          channel: "MOBILE APP", phone: "9850098500"
+        },
+        {
+          id: 5, type: "FLOOD", location: "Pune Central", lat: 18.5204, lng: 73.8567,
+          people: 2, extra: 1, verified: true, status: "RESOLVED",
+          channel: "MOBILE APP", phone: "9922001122"
+        }
+      ],
+      volunteers: [
+        {
+          id: 1, name: "Amit", phone: "9876543210", skill: "First Aid",
+          location: "Kothrud", lat: 18.5140, lng: 73.8160, available: true,
+          inbox: ["[CRITICAL ALERT] Flood #1 in Kothrud (1.14 km away) • 8 people"]
+        },
+        {
+          id: 2, name: "Priya", phone: "9123456780", skill: "Boat Rescue",
+          location: "Baner", lat: 18.5650, lng: 73.7940, available: true,
+          inbox: ["[CRITICAL ALERT] Medical #2 in Baner (1.01 km away) • 4 people"]
+        },
+        {
+          id: 3, name: "Rohan", phone: "9822112233", skill: "Paramedic",
+          location: "Pimpri", lat: 18.6220, lng: 73.8060, available: true,
+          inbox: ["[STANDBY] Ready in Pimpri-Chinchwad sector"]
+        },
+        {
+          id: 4, name: "Sneha", phone: "9766554433", skill: "Swimmer & Rope",
+          location: "Sinhagad Rd", lat: 18.4760, lng: 73.8310, available: true,
+          inbox: []
+        }
+      ],
+      shelters: [
+        { id: 1, name: "Govt School Camp", location: "Kothrud", lat: 18.5010, lng: 73.7970, capacity: 100, occupied: 38 },
+        { id: 2, name: "Community Hall", location: "Baner", lat: 18.5510, lng: 73.7770, capacity: 50, occupied: 22 },
+        { id: 3, name: "PCMC Relief Center", location: "Pimpri", lat: 18.6360, lng: 73.7910, capacity: 120, occupied: 45 }
+      ],
+      smsLogs: [
+        "17:02 [SMS] SOS|MEDICAL|Baner|18.5590,73.7868|4|true -> Incident #2 (Urgency: 70)",
+        "17:04 [APP] SOS|FLOOD|Kothrud|18.5074,73.8077|8|5 -> Incident #1 (Urgency: 90)"
+      ]
+    };
+
+    function computeUrgency(req) {
+      let score = req.people * 5;
+      if (req.verified) score += 10;
+      if (req.type === "FLOOD") {
+        score += Number(req.extra) * 8;
+      } else {
+        score += (req.extra === true || req.extra === "true") ? 40 : 10;
+      }
+      return score;
+    }
+
+    function getUrgencyMeta(req) {
+      const score = computeUrgency(req);
+      if (req.status.toUpperCase().includes("RESOLVED") || req.status.toUpperCase().includes("SAFE")) {
+        return { score, level: "RESOLVED", bgClass: "bg-urg-resolved", hex: "#2E9E5B", textHex: "#FFFFFF" };
+      }
+      if (score >= 70) return { score, level: "CRITICAL", bgClass: "bg-urg-critical", hex: "#D62828", textHex: "#FFFFFF" };
+      if (score >= 50) return { score, level: "HIGH", bgClass: "bg-urg-high", hex: "#F77F00", textHex: "#FFFFFF" };
+      if (score >= 30) return { score, level: "MEDIUM", bgClass: "bg-urg-medium", hex: "#FCBF49", textHex: "#1B2733" };
+      return { score, level: "LOW", bgClass: "bg-urg-low", hex: "#328CC1", textHex: "#FFFFFF" };
+    }
+
+    function haversineKm(lat1, lon1, lat2, lon2) {
+      const R = 6371.0;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    const MAP_BOUNDS = { minLat: 18.445, maxLat: 18.655, minLng: 73.745, maxLng: 73.945 };
+    function gpsToSvg(lat, lng) {
+      const x = ((lng - MAP_BOUNDS.minLng) / (MAP_BOUNDS.maxLng - MAP_BOUNDS.minLng)) * 680 + 40;
+      const y = 390 - ((lat - MAP_BOUNDS.minLat) / (MAP_BOUNDS.maxLat - MAP_BOUNDS.minLat)) * 350;
+      return {
+        x: Math.max(28, Math.min(732, x)),
+        y: Math.max(28, Math.min(402, y))
+      };
+    }
+
+    function svgToGps(x, y) {
+      const lng = MAP_BOUNDS.minLng + ((x - 40) / 680) * (MAP_BOUNDS.maxLng - MAP_BOUNDS.minLng);
+      const lat = MAP_BOUNDS.minLat + ((390 - y) / 350) * (MAP_BOUNDS.maxLat - MAP_BOUNDS.minLat);
+      return {
+        lat: Number(Math.max(18.45, Math.min(18.65, lat)).toFixed(4)),
+        lng: Number(Math.max(73.75, Math.min(73.94, lng)).toFixed(4))
+      };
+    }
+
+    function triggerMapSonarEffect(lat, lng, colorHex = "#F4A100") {
+      const sonarLayer = document.getElementById("mapSonarLayer");
+      if (!sonarLayer) return;
+      const pt = gpsToSvg(lat, lng);
+      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circle.setAttribute("cx", pt.x);
+      circle.setAttribute("cy", pt.y);
+      circle.setAttribute("r", "10");
+      circle.setAttribute("fill", "none");
+      circle.setAttribute("stroke", colorHex);
+      circle.setAttribute("class", "sonar-wave");
+      sonarLayer.appendChild(circle);
+      setTimeout(() => {
+        if (circle.parentNode) circle.parentNode.removeChild(circle);
+      }, 1450);
+    }
+
+    function showToast(message, variant = "navy") {
+      const container = document.getElementById("toastContainer");
+      const div = document.createElement("div");
+      let styleClass = "bg-navy";
+      if (variant === "red") styleClass = "bg-sos-red";
+      else if (variant === "green") styleClass = "bg-safe-green";
+      else if (variant === "amber") styleClass = "bg-warn-amber";
+      else if (variant === "flood") styleClass = "bg-flood";
+
+      div.className = `${styleClass} px-4 py-3.5 rounded-2xl shadow-xl text-xs font-bold flex items-center justify-between gap-3 pointer-events-auto border border-white/20 transition-all duration-300`;
+      div.innerHTML = `<span>${message}</span>`;
+      container.appendChild(div);
+      setTimeout(() => {
+        if (div.parentNode) div.parentNode.removeChild(div);
+      }, 3600);
+    }
+
+    function getSortedRequests() {
+      return [...state.requests].sort((a, b) => computeUrgency(b) - computeUrgency(a));
+    }
+
+    // ============================================================================
+    // RENDER FUNCTIONS
+    // ============================================================================
+    function renderAll() {
+      renderKpis();
+      renderLiveMap();
+      renderSelectedIncidentPanel();
+      renderIncidentQueue();
+      renderVolunteerAlertView();
+      renderSheltersView();
+      renderSmsLogs();
+      updateAppUrgencyPreview();
+    }
+
+    function renderKpis() {
+      const sorted = getSortedRequests();
+      const critical = sorted.filter(r => getUrgencyMeta(r).level === "CRITICAL").length;
+      const verified = sorted.filter(r => r.verified).length;
+      const totalPeople = sorted.filter(r => getUrgencyMeta(r).level !== "RESOLVED").reduce((acc, r) => acc + Number(r.people), 0);
+      const freeVols = state.volunteers.filter(v => v.available).length;
+      const freeBeds = state.shelters.reduce((acc, s) => acc + (s.capacity - s.occupied), 0);
+
+      document.getElementById("kpiVerifiedCount").textContent = verified;
+      document.getElementById("kpiCriticalCount").textContent = critical;
+      document.getElementById("kpiPeopleCount").textContent = `${totalPeople} citizens stranded`;
+      document.getElementById("kpiVolunteersFree").textContent = `${freeVols} / ${state.volunteers.length}`;
+      document.getElementById("kpiAlertsSentBadge").textContent = `${state.totalAlertsSent} proximity alerts sent`;
+      document.getElementById("kpiShelterFree").textContent = freeBeds;
+    }
+
+    function renderLiveMap() {
+      const verifiedOnly = document.getElementById("toggleVerifiedOnly").checked;
+      const showVolsAndShelters = document.getElementById("toggleShowVolunteers").checked;
+
+      const radarLayer = document.getElementById("mapRadarLayer");
+      const sheltersLayer = document.getElementById("mapSheltersLayer");
+      const volunteersLayer = document.getElementById("mapVolunteersLayer");
+      const incidentsLayer = document.getElementById("mapIncidentsLayer");
+
+      radarLayer.innerHTML = "";
+      sheltersLayer.innerHTML = "";
+      volunteersLayer.innerHTML = "";
+      incidentsLayer.innerHTML = "";
+
+      const selectedReq = state.requests.find(r => r.id === state.selectedRequestId) || getSortedRequests()[0];
+
+      // 1. Animated Radar Sweep & Proximity Links around selected incident
+      if (selectedReq) {
+        const center = gpsToSvg(selectedReq.lat, selectedReq.lng);
+        const radiusPx = state.alertRadiusKm * 28;
+        radarLayer.innerHTML += `
+          <g>
+            <circle cx="${center.x}" cy="${center.y}" r="${radiusPx}"
+              fill="url(#radarGrad)" stroke="#0B3C5D" stroke-width="1.5" stroke-dasharray="6,6" stroke-opacity="0.5" />
+            <g class="radar-sweep-group" style="transform-origin: ${center.x}px ${center.y}px;">
+              <line x1="${center.x}" y1="${center.y}" x2="${center.x + radiusPx}" y2="${center.y}"
+                stroke="#328CC1" stroke-width="2" stroke-opacity="0.65" />
+            </g>
+          </g>
+        `;
+
+        if (showVolsAndShelters) {
+          state.volunteers.forEach(vol => {
+            const dist = haversineKm(selectedReq.lat, selectedReq.lng, vol.lat, vol.lng);
+            if (dist <= state.alertRadiusKm && vol.available) {
+              const vp = gpsToSvg(vol.lat, vol.lng);
+              radarLayer.innerHTML += `
+                <line x1="${center.x}" y1="${center.y}" x2="${vp.x}" y2="${vp.y}"
+                  stroke="#0B3C5D" stroke-width="2" stroke-dasharray="5,5" class="dispatch-line" opacity="0.75" />
+              `;
+            }
+          });
+        }
+      }
+
+      // 2. Clean Safe Shelter Pins (#2E9E5B Green)
+      if (showVolsAndShelters) {
+        state.shelters.forEach(sh => {
+          const pt = gpsToSvg(sh.lat, sh.lng);
+          const free = sh.capacity - sh.occupied;
+          sheltersLayer.innerHTML += `
+            <g transform="translate(${pt.x}, ${pt.y})">
+              <rect x="-11" y="-11" width="22" height="22" rx="6" fill="#2E9E5B" stroke="#FFFFFF" stroke-width="2" />
+              <text x="0" y="4" text-anchor="middle" fill="#FFFFFF" font-size="10" font-weight="800">S</text>
+              <rect x="-48" y="14" width="96" height="17" rx="5" fill="#2E9E5B" />
+              <text x="0" y="25.5" text-anchor="middle" fill="#FFFFFF" font-size="9" font-weight="700">${sh.location} (${free} beds)</text>
+            </g>
+          `;
+        });
+
+        // 3. Clean Volunteer Markers (#0B3C5D Deep Navy)
+        state.volunteers.forEach(vol => {
+          const pt = gpsToSvg(vol.lat, vol.lng);
+          const fillCol = vol.available ? "#0B3C5D" : "#64748B";
+          volunteersLayer.innerHTML += `
+            <g transform="translate(${pt.x}, ${pt.y})">
+              <circle cx="0" cy="0" r="10" fill="${fillCol}" stroke="#FFFFFF" stroke-width="2" />
+              <text x="0" y="3.5" text-anchor="middle" fill="#FFFFFF" font-size="9" font-weight="800">V</text>
+              <rect x="-32" y="13" width="64" height="16" rx="5" fill="${fillCol}" />
+              <text x="0" y="24" text-anchor="middle" fill="#FFFFFF" font-size="8.5" font-weight="700">${vol.name}</text>
+            </g>
+          `;
+        });
+      }
+
+      // 4. Incident Pins (Uncluttered — pill label shown clearly on selected/hovered pin)
+      const listToDraw = getSortedRequests().filter(r => !verifiedOnly || r.verified);
+      listToDraw.forEach(req => {
+        const pt = gpsToSvg(req.lat, req.lng);
+        const meta = getUrgencyMeta(req);
+        const isSelected = selectedReq && selectedReq.id === req.id;
+        const pulseMarkup = (meta.level === "CRITICAL" && req.verified)
+          ? `<circle cx="0" cy="0" r="16" fill="${meta.hex}" class="pulse-circle" />`
+          : "";
+        const pinRadius = isSelected ? 15 : 12;
+        const strokeColor = isSelected ? "#0B3C5D" : "#FFFFFF";
+        const strokeWidth = isSelected ? 3.5 : 2.2;
+
+        const badgeOverlay = isSelected ? `
+          <rect x="-58" y="-34" width="116" height="20" rx="6" fill="${meta.hex}" stroke="#FFFFFF" stroke-width="1.2" />
+          <text x="0" y="-21" text-anchor="middle" fill="${meta.textHex}" font-size="9.5" font-weight="800">
+            ${req.location} • Urg ${meta.score}
+          </text>
+        ` : "";
+
+        incidentsLayer.innerHTML += `
+          <g class="map-incident-pin cursor-pointer" data-req-id="${req.id}" transform="translate(${pt.x}, ${pt.y})">
+            ${pulseMarkup}
+            <circle cx="0" cy="0" r="${pinRadius}" fill="${meta.hex}" stroke="${strokeColor}" stroke-width="${strokeWidth}" />
+            <text x="0" y="4" text-anchor="middle" fill="${meta.textHex}" font-size="10" font-weight="800">#${req.id}</text>
+            ${badgeOverlay}
+          </g>
+        `;
+      });
+
+      document.querySelectorAll(".map-incident-pin").forEach(pin => {
+        pin.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const id = Number(pin.getAttribute("data-req-id"));
+          state.selectedRequestId = id;
+          const r = state.requests.find(item => item.id === id);
+          if (r) triggerMapSonarEffect(r.lat, r.lng, "#328CC1");
+          playSoundEffect("radar");
+          renderAll();
+        });
+      });
+    }
+
+    function renderSelectedIncidentPanel() {
+      const req = state.requests.find(r => r.id === state.selectedRequestId) || getSortedRequests()[0];
+      const titleEl = document.getElementById("selIncTitle");
+      const metaEl = document.getElementById("selIncMeta");
+      const chanEl = document.getElementById("selIncChannelBadge");
+      if (!req) {
+        titleEl.textContent = "No incident selected";
+        metaEl.textContent = "";
+        return;
+      }
+      const meta = getUrgencyMeta(req);
+      const detailText = req.type === "FLOOD" ? `Water Depth: ${req.extra} ft` : `Critical Medical: ${req.extra ? "Yes" : "No"}`;
+      chanEl.textContent = `${req.type} • ${req.channel}`;
+      titleEl.innerHTML = `#${req.id} ${req.location} <span class="ml-2 px-2.5 py-0.5 rounded-lg text-xs font-extrabold ${meta.bgClass}">Urgency ${meta.score} • ${meta.level}</span>`;
+      metaEl.textContent = `GPS: ${req.lat.toFixed(4)}°N, ${req.lng.toFixed(4)}°E  •  ${req.people} People  •  ${detailText}  •  ${req.status}`;
+    }
+
+    function renderIncidentQueue() {
+      const locFilter = document.getElementById("filterLocationInput").value.trim().toLowerCase();
+      const minUrg = Number(document.getElementById("filterUrgencyInput").value) || 0;
+      const typeFilter = document.getElementById("filterTypeSelect").value;
+
+      const filtered = getSortedRequests().filter(r => {
+        const score = computeUrgency(r);
+        if (locFilter && !r.location.toLowerCase().includes(locFilter)) return false;
+        if (score < minUrg) return false;
+        if (typeFilter !== "ALL" && r.type !== typeFilter) return false;
+        return true;
+      });
+
+      const container = document.getElementById("incidentQueueList");
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-xs font-semibold text-[#1B2733]/65 bg-[#F4F8FB] rounded-2xl">No distress requests match your current filters.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(req => {
+        const meta = getUrgencyMeta(req);
+        const isSelected = req.id === state.selectedRequestId;
+        const extraLabel = req.type === "FLOOD" ? `${req.extra} ft water` : (req.extra ? "Critical Condition" : "Medical Aid");
+        return `
+          <div data-card-id="${req.id}" class="queue-card hover-lift p-4 rounded-2xl border transition cursor-pointer ${isSelected ? "border-[#0B3C5D] bg-[#F4F8FB] shadow-sm" : "border-[#328CC1]/20 bg-white"}">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-navy">#${req.id}</span>
+                <span class="font-extrabold text-sm text-[#1B2733]">${req.location}</span>
+                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-lg bg-flood">${req.type}</span>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold ${meta.bgClass}">
+                ${meta.score} • ${meta.level}
+              </span>
+            </div>
+
+            <div class="mt-2.5 flex flex-wrap items-center justify-between text-xs text-[#1B2733]/80 gap-2">
+              <span><strong>${req.people} people</strong> • ${extraLabel}</span>
+              <span class="font-mono-code text-[11px] text-[#0B3C5D]">${req.lat.toFixed(4)}°N, ${req.lng.toFixed(4)}°E</span>
+            </div>
+
+            <div class="mt-3 pt-2.5 border-t border-[#328CC1]/15 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-md font-bold text-[11px] ${req.verified ? "bg-safe-green" : "bg-warn-amber"}">
+                  ${req.verified ? "Verified on Map" : "Unverified"}
+                </span>
+                <span class="font-bold text-[11px] text-[#0B3C5D]">${req.status}</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                ${!req.verified ? `<button data-act="verify" data-id="${req.id}" class="card-act-btn btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold btn-flood">Verify</button>` : ""}
+                <button data-act="alert" data-id="${req.id}" class="card-act-btn btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold btn-amber">Alert Near</button>
+                <button data-act="assign" data-id="${req.id}" class="card-act-btn btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold btn-navy">Dispatch</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      container.querySelectorAll(".queue-card").forEach(card => {
+        card.addEventListener("click", () => {
+          state.selectedRequestId = Number(card.getAttribute("data-card-id"));
+          const r = state.requests.find(item => item.id === state.selectedRequestId);
+          if (r) triggerMapSonarEffect(r.lat, r.lng, "#328CC1");
+          renderAll();
+        });
+      });
+
+      container.querySelectorAll(".card-act-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const act = btn.getAttribute("data-act");
+          const id = Number(btn.getAttribute("data-id"));
+          state.selectedRequestId = id;
+          if (act === "verify") verifyIncidentById(id);
+          else if (act === "alert") alertNearbyVolunteersForRequest(id);
+          else if (act === "assign") assignNearestVolunteerToRequest(id);
+        });
+      });
+    }
+
+    function renderVolunteerAlertView() {
+      const selectEl = document.getElementById("alertTargetRequestSelect");
+      const currentVal = Number(selectEl.value) || state.selectedRequestId;
+      selectEl.innerHTML = getSortedRequests().map(r => {
+        const meta = getUrgencyMeta(r);
+        return `<option value="${r.id}" ${r.id === currentVal ? "selected" : ""}>Incident #${r.id}: ${r.location} (${r.type} • ${meta.level})</option>`;
+      }).join("");
+
+      const targetReq = state.requests.find(r => r.id === Number(selectEl.value)) || getSortedRequests()[0];
+      const volContainer = document.getElementById("volunteerCardsContainer");
+
+      volContainer.innerHTML = state.volunteers.map(vol => {
+        const dist = targetReq ? haversineKm(targetReq.lat, targetReq.lng, vol.lat, vol.lng) : 0;
+        const isNearby = dist <= state.alertRadiusKm;
+        const inboxHtml = vol.inbox.length === 0
+          ? `<div class="text-xs text-[#1B2733]/60 italic">No location alerts received yet.</div>`
+          : vol.inbox.slice().reverse().map(msg => `<div class="px-3 py-1.5 rounded-xl bg-white border border-[#328CC1]/25 font-mono-code text-[11px] text-[#1B2733]">${msg}</div>`).join("");
+
+        return `
+          <div class="p-4 rounded-2xl bg-[#F4F8FB] border transition ${isNearby ? "border-[#328CC1]" : "border-[#0B3C5D]/10"}">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-extrabold text-sm text-[#0B3C5D]">${vol.name}</span>
+                  <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-flood">${vol.skill}</span>
+                  <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold ${vol.available ? "bg-safe-green" : "bg-warn-amber"}">
+                    ${vol.available ? "AVAILABLE" : "ON MISSION"}
+                  </span>
+                </div>
+                <p class="text-xs text-[#1B2733]/75 font-mono-code mt-1">
+                  ${vol.location} (${vol.lat.toFixed(4)}°N, ${vol.lng.toFixed(4)}°E) • ${vol.phone}
+                </p>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="px-3 py-1 rounded-xl text-xs font-mono-code font-bold ${isNearby ? "bg-warn-amber" : "bg-navy"}">
+                  ${dist.toFixed(2)} km away
+                </span>
+                <button data-vol-toggle="${vol.id}" class="vol-toggle-btn btn-interactive px-3 py-1 rounded-xl text-xs font-bold btn-navy">
+                  ${vol.available ? "Set Busy" : "Set Free"}
+                </button>
+              </div>
+            </div>
+            <div class="mt-3 space-y-1.5">
+              <span class="text-[11px] font-bold text-[#0B3C5D] uppercase tracking-wider">Mobile Alert Inbox (${vol.inbox.length}):</span>
+              ${inboxHtml}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      volContainer.querySelectorAll(".vol-toggle-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const vid = Number(btn.getAttribute("data-vol-toggle"));
+          const v = state.volunteers.find(item => item.id === vid);
+          if (v) {
+            v.available = !v.available;
+            renderAll();
+          }
+        });
+      });
+    }
+
+    function renderSheltersView() {
+      const container = document.getElementById("shelterCardsContainer");
+      container.innerHTML = state.shelters.map(sh => {
+        const free = sh.capacity - sh.occupied;
+        const pct = Math.min(100, Math.round((sh.occupied / sh.capacity) * 100));
+        return `
+          <div class="p-4 rounded-2xl bg-[#F4F8FB] border border-[#2E9E5B]/30 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-extrabold text-sm text-[#1B2733]">${sh.name} • ${sh.location}</h3>
+                <p class="text-xs font-mono-code text-[#1B2733]/70">GPS: ${sh.lat.toFixed(4)}°N, ${sh.lng.toFixed(4)}°E</p>
+              </div>
+              <span class="px-3 py-1 rounded-xl text-xs font-extrabold ${free > 15 ? "bg-safe-green" : "bg-warn-amber"}">
+                ${free} / ${sh.capacity} Beds Free
+              </span>
+            </div>
+            <div class="w-full h-3 rounded-full bg-white overflow-hidden border border-[#2E9E5B]/25">
+              <div class="h-full bg-safe-green transition-all duration-300" style="width: ${pct}%"></div>
+            </div>
+            <div class="flex items-center justify-between pt-1">
+              <span class="text-xs font-semibold text-[#1B2733]">Occupied: ${sh.occupied} citizens (${pct}%)</span>
+              <div class="flex items-center gap-2">
+                <button data-sh-id="${sh.id}" data-admit="5" class="shelter-admit-btn btn-interactive px-3 py-1 rounded-xl text-xs font-bold btn-safe">Admit +5</button>
+                <button data-sh-id="${sh.id}" data-admit="10" class="shelter-admit-btn btn-interactive px-3 py-1 rounded-xl text-xs font-bold btn-navy">Admit +10</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      container.querySelectorAll(".shelter-admit-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const sid = Number(btn.getAttribute("data-sh-id"));
+          const count = Number(btn.getAttribute("data-admit"));
+          const sh = state.shelters.find(s => s.id === sid);
+          if (sh) {
+            if (sh.occupied + count <= sh.capacity) {
+              sh.occupied += count;
+              playSoundEffect("success");
+              showToast(`Admitted ${count} rescued citizens to ${sh.name} (${sh.capacity - sh.occupied} beds free).`, "green");
+              renderAll();
+            } else {
+              showToast(`Not enough beds in ${sh.name}! Only ${sh.capacity - sh.occupied} available.`, "amber");
+            }
+          }
+        });
+      });
+    }
+
+    function renderSmsLogs() {
+      const logBox = document.getElementById("smsGatewayLog");
+      logBox.innerHTML = state.smsLogs.slice().reverse().map(l => `<div class="py-1 border-b border-[#328CC1]/10 last:border-none">${l}</div>`).join("");
+    }
+
+    // ============================================================================
+    // ACTIONS: VERIFY, PROXIMITY ALERT, DISPATCH
+    // ============================================================================
+    function verifyIncidentById(id) {
+      const req = state.requests.find(r => r.id === id);
+      if (!req) return;
+      req.verified = true;
+      const meta = getUrgencyMeta(req);
+      playSoundEffect("success");
+      triggerMapSonarEffect(req.lat, req.lng, "#2E9E5B");
+      showToast(`Verified Incident #${id} (${req.location})! Pinned to Live GPS Map with Urgency ${meta.score}.`, "flood");
+      renderAll();
+    }
+
+    function alertNearbyVolunteersForRequest(id) {
+      const req = state.requests.find(r => r.id === id);
+      if (!req) return;
+      const meta = getUrgencyMeta(req);
+      let count = 0;
+      state.volunteers.forEach(vol => {
+        if (!vol.available) return;
+        const dist = haversineKm(req.lat, req.lng, vol.lat, vol.lng);
+        const sameSector = vol.location.toLowerCase() === req.location.toLowerCase();
+        if (dist <= state.alertRadiusKm || sameSector) {
+          const msg = `[${meta.level} ALERT] Incident #${req.id} (${req.type}) in ${req.location} (${dist.toFixed(2)} km away) • ${req.people} people`;
+          vol.inbox.push(msg);
+          count++;
+          state.totalAlertsSent++;
+        }
+      });
+      playSoundEffect("radar");
+      triggerMapSonarEffect(req.lat, req.lng, "#F4A100");
+      if (count > 0) {
+        showToast(`Sent location alert (within ${state.alertRadiusKm} km) for Incident #${id} to ${count} nearby volunteer(s)!`, "amber");
+      } else {
+        showToast(`No free volunteers within ${state.alertRadiusKm} km of ${req.location}. Try increasing the radar slider.`, "red");
+      }
+      renderAll();
+    }
+
+    function assignNearestVolunteerToRequest(id) {
+      const req = state.requests.find(r => r.id === id);
+      if (!req) return;
+      let nearest = null;
+      let minDist = Infinity;
+      state.volunteers.forEach(vol => {
+        if (vol.available) {
+          const d = haversineKm(req.lat, req.lng, vol.lat, vol.lng);
+          if (d < minDist) {
+            minDist = d;
+            nearest = vol;
+          }
+        }
+      });
+      if (!nearest) {
+        showToast("All volunteers are currently deployed!", "red");
+        return;
+      }
+      nearest.available = false;
+      req.status = `ASSIGNED (${nearest.name})`;
+      nearest.inbox.push(`[DISPATCHED] Assigned to Incident #${req.id} at ${req.location} (${minDist.toFixed(2)} km away)`);
+      state.totalAlertsSent++;
+      playSoundEffect("success");
+      triggerMapSonarEffect(req.lat, req.lng, "#2E9E5B");
+      showToast(`Dispatched nearest volunteer ${nearest.name} (${nearest.skill}, ${minDist.toFixed(2)} km away) to Incident #${req.id}!`, "green");
+      renderAll();
+    }
+
+    function updateAppUrgencyPreview() {
+      const people = Number(document.getElementById("appPeopleInput").value) || 1;
+      const water = Number(document.getElementById("appWaterLevelSlider").value) || 1;
+      const critical = document.getElementById("appCriticalCheckbox").checked;
+      const autoVer = document.getElementById("appAutoVerifyCheck").checked;
+
+      document.getElementById("appWaterLevelVal").textContent = `${water} ft`;
+      const gauge = document.getElementById("waterGaugeBar");
+      if (gauge) gauge.style.width = `${Math.min(100, Math.round((water / 15) * 100))}%`;
+
+      const tempReq = {
+        type: state.appSelectedType,
+        people,
+        extra: state.appSelectedType === "FLOOD" ? water : critical,
+        verified: autoVer,
+        status: "PENDING"
+      };
+      const meta = getUrgencyMeta(tempReq);
+      const extraText = state.appSelectedType === "FLOOD"
+        ? `${water} ft water depth`
+        : (critical ? "Critical Medical" : "Standard Medical");
+      document.getElementById("appFormulaPreview").textContent =
+        `${people} people • ${extraText} • ${autoVer ? "GPS Verified" : "Unverified"}`;
+
+      const badge = document.getElementById("appUrgencyBadgePreview");
+      badge.className = `px-3.5 py-1.5 rounded-xl font-extrabold text-xs ${meta.bgClass}`;
+      badge.textContent = `${meta.score} • ${meta.level}`;
+    }
+
+    // ============================================================================
+    // INITIALIZE LISTENERS
+    // ============================================================================
+    window.addEventListener("DOMContentLoaded", () => {
+      const tabBtns = document.querySelectorAll(".nav-tab-btn");
+      const tabViews = document.querySelectorAll(".tab-view");
+
+      function switchTab(targetId) {
+        tabViews.forEach(v => v.classList.toggle("hidden", v.id !== targetId));
+        tabBtns.forEach(b => {
+          const active = b.getAttribute("data-tab") === targetId;
+          b.className = active
+            ? "nav-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-flood text-white shadow transition"
+            : "nav-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white/90 hover:bg-white/10 transition";
+        });
+      }
+
+      tabBtns.forEach(btn => {
+        btn.addEventListener("click", () => switchTab(btn.getAttribute("data-tab")));
+      });
+
+      document.getElementById("quickSosBtn").addEventListener("click", () => {
+        playSoundEffect("sos");
+        switchTab("citizenView");
+      });
+
+      // Sound Toggle
+      document.getElementById("soundToggleBtn").addEventListener("click", () => {
+        soundEnabled = !soundEnabled;
+        document.getElementById("soundIcon").textContent = soundEnabled ? "🔊" : "🔇";
+        document.getElementById("soundLabel").textContent = soundEnabled ? "Sound FX On" : "Muted";
+        if (soundEnabled) playSoundEffect("success");
+      });
+
+      // Map Controls
+      document.getElementById("toggleVerifiedOnly").addEventListener("change", renderLiveMap);
+      document.getElementById("toggleShowVolunteers").addEventListener("change", renderLiveMap);
+      document.getElementById("mapRadiusSlider").addEventListener("input", (e) => {
+        state.alertRadiusKm = Number(e.target.value);
+        document.getElementById("mapRadiusLabel").textContent = `${state.alertRadiusKm.toFixed(1)} km`;
+        renderAll();
+      });
+
+      // Map Click & Cursor Readout
+      const mapSvg = document.getElementById("liveGpsMapSvg");
+      mapSvg.addEventListener("mousemove", (e) => {
+        const rect = mapSvg.getBoundingClientRect();
+        const scaleX = 760 / rect.width;
+        const scaleY = 430 / rect.height;
+        const pt = svgToGps((e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY);
+        document.getElementById("mapCursorReadout").textContent =
+          `GPS: ${pt.lat.toFixed(4)}° N, ${pt.lng.toFixed(4)}° E • Click map to set SOS coordinates`;
+      });
+      mapSvg.addEventListener("click", (e) => {
+        const rect = mapSvg.getBoundingClientRect();
+        const scaleX = 760 / rect.width;
+        const scaleY = 430 / rect.height;
+        const pt = svgToGps((e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY);
+        document.getElementById("appLatInput").value = pt.lat;
+        document.getElementById("appLngInput").value = pt.lng;
+        triggerMapSonarEffect(pt.lat, pt.lng, "#328CC1");
+        playSoundEffect("radar");
+        showToast(`Captured GPS coordinates (${pt.lat}°N, ${pt.lng}°E) for Citizen SOS!`, "flood");
+      });
+
+      // Selected Incident Buttons
+      document.getElementById("btnVerifySelected").addEventListener("click", () => verifyIncidentById(state.selectedRequestId));
+      document.getElementById("btnAlertNearbySelected").addEventListener("click", () => alertNearbyVolunteersForRequest(state.selectedRequestId));
+      document.getElementById("btnAssignNearestSelected").addEventListener("click", () => assignNearestVolunteerToRequest(state.selectedRequestId));
+      document.getElementById("btnResolveSelected").addEventListener("click", () => {
+        const req = state.requests.find(r => r.id === state.selectedRequestId);
+        if (req) {
+          req.status = "RESOLVED";
+          playSoundEffect("success");
+          triggerMapSonarEffect(req.lat, req.lng, "#2E9E5B");
+          showToast(`Marked Incident #${req.id} (${req.location}) as Resolved & Safe!`, "green");
+          renderAll();
+        }
+      });
+
+      // Filters
+      document.getElementById("filterLocationInput").addEventListener("input", renderIncidentQueue);
+      document.getElementById("filterUrgencyInput").addEventListener("input", renderIncidentQueue);
+      document.getElementById("filterTypeSelect").addEventListener("change", renderIncidentQueue);
+      document.getElementById("btnResetFilters").addEventListener("click", () => {
+        document.getElementById("filterLocationInput").value = "";
+        document.getElementById("filterUrgencyInput").value = 0;
+        document.getElementById("filterTypeSelect").value = "ALL";
+        renderIncidentQueue();
+      });
+
+      // Citizen Mobile App Controls
+      const floodBtn = document.getElementById("appTypeFloodBtn");
+      const medBtn = document.getElementById("appTypeMedicalBtn");
+      floodBtn.addEventListener("click", () => {
+        state.appSelectedType = "FLOOD";
+        floodBtn.className = "btn-interactive p-3.5 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 bg-flood shadow-sm border-2 border-[#0B3C5D]";
+        medBtn.className = "btn-interactive p-3.5 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 bg-[#F4F8FB] text-[#1B2733] border-2 border-[#328CC1]/30";
+        document.getElementById("appFloodExtraBox").classList.remove("hidden");
+        document.getElementById("appMedicalExtraBox").classList.add("hidden");
+        updateAppUrgencyPreview();
+      });
+      medBtn.addEventListener("click", () => {
+        state.appSelectedType = "MEDICAL";
+        medBtn.className = "btn-interactive p-3.5 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 bg-sos-red shadow-sm border-2 border-[#0B3C5D]";
+        floodBtn.className = "btn-interactive p-3.5 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 bg-[#F4F8FB] text-[#1B2733] border-2 border-[#328CC1]/30";
+        document.getElementById("appMedicalExtraBox").classList.remove("hidden");
+        document.getElementById("appFloodExtraBox").classList.add("hidden");
+        updateAppUrgencyPreview();
+      });
+
+      document.getElementById("appLocationSelect").addEventListener("change", (e) => {
+        const coords = SECTOR_COORDS[e.target.value];
+        if (coords) {
+          document.getElementById("appLatInput").value = coords.lat;
+          document.getElementById("appLngInput").value = coords.lng;
+        }
+      });
+      document.getElementById("appPeopleInput").addEventListener("input", updateAppUrgencyPreview);
+      document.getElementById("appWaterLevelSlider").addEventListener("input", updateAppUrgencyPreview);
+      document.getElementById("appCriticalCheckbox").addEventListener("change", updateAppUrgencyPreview);
+      document.getElementById("appAutoVerifyCheck").addEventListener("change", updateAppUrgencyPreview);
+
+      document.getElementById("submitMobileSosBtn").addEventListener("click", () => {
+        const loc = document.getElementById("appLocationSelect").value;
+        const lat = Number(document.getElementById("appLatInput").value) || 18.5074;
+        const lng = Number(document.getElementById("appLngInput").value) || 73.8077;
+        const people = Math.max(1, Number(document.getElementById("appPeopleInput").value) || 1);
+        const phone = document.getElementById("appPhoneInput").value.trim() || "9876543210";
+        const autoVer = document.getElementById("appAutoVerifyCheck").checked;
+        const autoAlert = document.getElementById("appAutoAlertCheck").checked;
+        const extra = state.appSelectedType === "FLOOD"
+          ? Number(document.getElementById("appWaterLevelSlider").value)
+          : document.getElementById("appCriticalCheckbox").checked;
+
+        const newReq = {
+          id: state.nextId++,
+          type: state.appSelectedType,
+          location: loc,
+          lat,
+          lng,
+          people,
+          extra,
+          verified: autoVer,
+          status: "PENDING",
+          channel: "MOBILE APP",
+          phone
+        };
+        state.requests.push(newReq);
+        state.selectedRequestId = newReq.id;
+        const meta = getUrgencyMeta(newReq);
+        state.smsLogs.push(`${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} [APP] SOS|${newReq.type}|${loc}|${lat},${lng}|${people} -> Incident #${newReq.id} (${meta.level})`);
+
+        playSoundEffect("sos");
+        switchTab("mapView");
+        setTimeout(() => {
+          triggerMapSonarEffect(newReq.lat, newReq.lng, "#D62828");
+          if (autoAlert) {
+            alertNearbyVolunteersForRequest(newReq.id);
+          } else {
+            showToast(`Distress SOS #${newReq.id} pinned to Live Map (${meta.level} Urgency: ${meta.score})!`, "red");
+          }
+        }, 120);
+        renderAll();
+      });
+
+      // Offline SMS Preset & Parser
+      document.querySelectorAll(".sms-preset-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.getElementById("rawSmsInput").value = btn.getAttribute("data-sms");
+        });
+      });
+
+      document.getElementById("parseSmsBtn").addEventListener("click", () => {
+        const raw = document.getElementById("rawSmsInput").value.trim();
+        const parts = raw.split("|");
+        if (parts.length < 6 || parts[0].toUpperCase() !== "SOS") {
+          showToast("Invalid SMS format! Use: SOS|TYPE|AREA|LAT,LNG|PEOPLE|EXTRA|PHONE", "red");
+          return;
+        }
+        const type = parts[1].trim().toUpperCase() === "MEDICAL" ? "MEDICAL" : "FLOOD";
+        const location = parts[2].trim();
+        const coords = parts[3].split(",");
+        const lat = Number(coords[0]) || 18.5204;
+        const lng = Number(coords[1]) || 73.8567;
+        const people = Math.max(1, parseInt(parts[4], 10) || 1);
+        const extraRaw = parts[5].trim();
+        const extra = type === "FLOOD" ? (parseInt(extraRaw, 10) || 3) : (extraRaw.toLowerCase() === "true" || extraRaw.toLowerCase() === "y");
+        const phone = parts[6] ? parts[6].trim() : "UNKNOWN";
+
+        const newReq = {
+          id: state.nextId++,
+          type,
+          location,
+          lat,
+          lng,
+          people,
+          extra,
+          verified: true,
+          status: "PENDING",
+          channel: "SMS",
+          phone
+        };
+        state.requests.push(newReq);
+        state.selectedRequestId = newReq.id;
+        const meta = getUrgencyMeta(newReq);
+        state.smsLogs.push(`${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} [SMS] ${raw} -> Incident #${newReq.id} (${meta.level})`);
+        playSoundEffect("sos");
+        alertNearbyVolunteersForRequest(newReq.id);
+        renderAll();
+      });
+
+      // Volunteer & Shelter Controls
+      document.getElementById("alertTargetRequestSelect").addEventListener("change", (e) => {
+        state.selectedRequestId = Number(e.target.value);
+        renderVolunteerAlertView();
+      });
+      document.getElementById("broadcastProximityAlertBtn").addEventListener("click", () => {
+        const targetId = Number(document.getElementById("alertTargetRequestSelect").value) || state.selectedRequestId;
+        alertNearbyVolunteersForRequest(targetId);
+      });
+
+      document.getElementById("addVolunteerBtn").addEventListener("click", () => {
+        const name = document.getElementById("newVolName").value.trim();
+        const phone = document.getElementById("newVolPhone").value.trim() || "9800000000";
+        const skill = document.getElementById("newVolSkill").value;
+        const loc = document.getElementById("newVolLoc").value;
+        if (!name) {
+          showToast("Please enter a volunteer name.", "amber");
+          return;
+        }
+        const base = SECTOR_COORDS[loc] || { lat: 18.5204, lng: 73.8567 };
+        state.volunteers.push({
+          id: state.volunteers.length + 1,
+          name,
+          phone,
+          skill,
+          location: loc,
+          lat: Number((base.lat + (Math.random() - 0.5) * 0.008).toFixed(4)),
+          lng: Number((base.lng + (Math.random() - 0.5) * 0.008).toFixed(4)),
+          available: true,
+          inbox: []
+        });
+        document.getElementById("newVolName").value = "";
+        playSoundEffect("success");
+        showToast(`Added Volunteer ${name} (${skill}) in ${loc}!`, "green");
+        renderAll();
+      });
+
+      document.getElementById("addShelterBtn").addEventListener("click", () => {
+        const name = document.getElementById("newShelterName").value.trim();
+        const loc = document.getElementById("newShelterLoc").value;
+        const cap = Math.max(10, Number(document.getElementById("newShelterCap").value) || 80);
+        if (!name) {
+          showToast("Please enter a shelter name.", "amber");
+          return;
+        }
+        const base = SECTOR_COORDS[loc] || { lat: 18.5204, lng: 73.8567 };
+        state.shelters.push({
+          id: state.shelters.length + 1,
+          name,
+          location: loc,
+          lat: Number((base.lat + 0.003).toFixed(4)),
+          lng: Number((base.lng - 0.003).toFixed(4)),
+          capacity: cap,
+          occupied: 0
+        });
+        document.getElementById("newShelterName").value = "";
+        playSoundEffect("success");
+        showToast(`Added Safe Shelter "${name}" (${cap} beds) in ${loc}!`, "green");
+        renderAll();
+      });
+
+      renderAll();
+    });
+  </script>
+</body>
+</html>
